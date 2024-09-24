@@ -53,7 +53,103 @@
     </div>
 
     <script>
-        
+        // Replace with your actual Metered Space URL
+const METERED_DOMAIN = "YOUR_METERED_DOMAIN.metered.live";
+
+// Initialize the Metered SDK
+const meeting = new Metered.Meeting();
+
+// Get DOM elements
+const shareScreenButton = document.getElementById("share-screen");
+const shareMicrophoneButton = document.getElementById("share-microphone");
+const stopScreenShareButton = document.getElementById("stop-screen-share");
+const stopMicrophoneButton = document.getElementById("stop-microphone");
+const localVideo = document.getElementById("local-video");
+const remoteVideoContainer = document.getElementById("remote-video-container");
+
+// Join the Metered space
+async function joinSpace() {
+    try {
+        await meeting.join({
+            roomURL: `${METERED_DOMAIN}/YOUR_ROOM_NAME`,
+        });
+        console.log("Successfully joined the meeting");
+    } catch (error) {
+        console.error("Error joining the meeting:", error);
+    }
+}
+
+// Share screen
+shareScreenButton.addEventListener("click", async () => {
+    try {
+        const screenStream = await meeting.startScreenShare();
+        localVideo.srcObject = screenStream;
+        shareScreenButton.disabled = true;
+        stopScreenShareButton.disabled = false;
+    } catch (error) {
+        console.error("Error sharing screen:", error);
+    }
+});
+
+// Stop screen share
+stopScreenShareButton.addEventListener("click", async () => {
+    try {
+        await meeting.stopScreenShare();
+        localVideo.srcObject = null;
+        shareScreenButton.disabled = false;
+        stopScreenShareButton.disabled = true;
+    } catch (error) {
+        console.error("Error stopping screen share:", error);
+    }
+});
+
+// Share microphone
+shareMicrophoneButton.addEventListener("click", async () => {
+    try {
+        const audioStream = await meeting.startAudio();
+        shareMicrophoneButton.disabled = true;
+        stopMicrophoneButton.disabled = false;
+    } catch (error) {
+        console.error("Error sharing microphone:", error);
+    }
+});
+
+// Stop microphone
+stopMicrophoneButton.addEventListener("click", async () => {
+    try {
+        await meeting.stopAudio();
+        shareMicrophoneButton.disabled = false;
+        stopMicrophoneButton.disabled = true;
+    } catch (error) {
+        console.error("Error stopping microphone:", error);
+    }
+});
+
+// Handle remote participants
+meeting.on("remoteTrackStarted", (trackItem) => {
+    const participant = meeting.participants.get(trackItem.participantSessionId);
+    let videoElement = document.getElementById(trackItem.participantSessionId);
+    
+    if (!videoElement) {
+        videoElement = document.createElement("video");
+        videoElement.id = trackItem.participantSessionId;
+        videoElement.autoplay = true;
+        videoElement.playsInline = true;
+        remoteVideoContainer.appendChild(videoElement);
+    }
+    
+    videoElement.srcObject = participant.stream;
+});
+
+meeting.on("remoteTrackStopped", (trackItem) => {
+    const videoElement = document.getElementById(trackItem.participantSessionId);
+    if (videoElement) {
+        videoElement.remove();
+    }
+});
+
+// Initialize the meeting
+joinSpace();
     </script>
 </body>
 </html>
