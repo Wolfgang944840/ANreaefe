@@ -1,0 +1,19 @@
+<video id="local-video" muted autoplay></video>
+<button onclick="captureScreen()">Capture</button>
+<script>
+    async function captureScreen() {
+    let mediaStream = null;
+    try {
+        mediaStream = await navigator.mediaDevices.getDisplayMedia({
+            video: {
+                cursor: "always"
+            },
+            audio: true
+        });
+
+        document.getElementById("local-video").srcObject = mediaStream;
+    } catch (ex) {
+        console.log("Error occurred", ex);
+    }
+}
+</script>
