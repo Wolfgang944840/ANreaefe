@@ -1,19 +1,59 @@
-<video id="local-video" muted autoplay></video>
-<button onclick="captureScreen()">Capture</button>
-<script>
-    async function captureScreen() {
-    let mediaStream = null;
-    try {
-        mediaStream = await navigator.mediaDevices.getDisplayMedia({
-            video: {
-                cursor: "always"
-            },
-            audio: true
-        });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC - Screen Sharing Demo</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
 
-        document.getElementById("local-video").srcObject = mediaStream;
-    } catch (ex) {
-        console.log("Error occurred", ex);
-    }
-}
-</script>
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+
+    <!-- Milligram CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+
+    <script type="text/javascript" src="https://cdn.metered.ca/sdk/video/1.4.5/sdk.min.js"></script>
+</head>
+<body>
+   <div class="container">
+        <h1>WebRTC Screen Sharing Demo</h1>
+        <hr>
+        <div class="row">
+            <div class="column">
+                <button id="share-screen">Share Screen</button>
+            </div>
+            <div class="column">
+                <button id="share-microphone">Share Microphone</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <button id="stop-screen-share" class="button-outline">Stop Screen Sharing</button>
+            </div>
+            <div class="column">
+                <button id="stop-microphone" class="button-outline">Stop Microphone</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <h3>Remote Video</h3>
+                <div id="remote-video-container">
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <h3>Local Video</h3>
+                <video src="" muted autoplay id="local-video" style="max-width: 800px"></video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+    </script>
+</body>
+</html>
