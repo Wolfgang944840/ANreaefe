@@ -14,7 +14,6 @@
     <!-- Milligram CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
 
-    <script type="text/javascript" src="https://cdn.metered.ca/sdk/video/1.4.5/sdk.min.js"></script>
 </head>
 <body>
    <div class="container">
@@ -24,17 +23,12 @@
             <div class="column">
                 <button id="share-screen">Share Screen</button>
             </div>
-            <div class="column">
-                <button id="share-microphone">Share Microphone</button>
-            </div>
         </div>
         <div class="row">
             <div class="column">
                 <button id="stop-screen-share" class="button-outline">Stop Screen Sharing</button>
             </div>
-            <div class="column">
-                <button id="stop-microphone" class="button-outline">Stop Microphone</button>
-            </div>
+    
         </div>
         <div class="row">
             <div class="column">
@@ -53,103 +47,48 @@
     </div>
 
     <script>
-        // Replace with your actual Metered Space URL
-const METERED_DOMAIN = "YOUR_METERED_DOMAIN.metered.live";
 
-// Initialize the Metered SDK
-const meeting = new Metered.Meeting();
+// Replace the entire script content with this:
 
 // Get DOM elements
 const shareScreenButton = document.getElementById("share-screen");
-const shareMicrophoneButton = document.getElementById("share-microphone");
 const stopScreenShareButton = document.getElementById("stop-screen-share");
-const stopMicrophoneButton = document.getElementById("stop-microphone");
 const localVideo = document.getElementById("local-video");
-const remoteVideoContainer = document.getElementById("remote-video-container");
 
-// Join the Metered space
-async function joinSpace() {
-    try {
-        await meeting.join({
-            roomURL: `${METERED_DOMAIN}/YOUR_ROOM_NAME`,
-        });
-        console.log("Successfully joined the meeting");
-    } catch (error) {
-        console.error("Error joining the meeting:", error);
-    }
-}
+let screenStream = null;
 
 // Share screen
 shareScreenButton.addEventListener("click", async () => {
     try {
-        const screenStream = await meeting.startScreenShare();
+        screenStream = await navigator.mediaDevices.getDisplayMedia({video: true});
         localVideo.srcObject = screenStream;
         shareScreenButton.disabled = true;
         stopScreenShareButton.disabled = false;
+
+        // Listen for the end of screen sharing
+        screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+            stopScreenSharing();
+        });
     } catch (error) {
         console.error("Error sharing screen:", error);
     }
 });
 
 // Stop screen share
-stopScreenShareButton.addEventListener("click", async () => {
-    try {
-        await meeting.stopScreenShare();
+stopScreenShareButton.addEventListener("click", stopScreenSharing);
+
+function stopScreenSharing() {
+    if (screenStream) {
+        screenStream.getTracks().forEach(track => track.stop());
         localVideo.srcObject = null;
         shareScreenButton.disabled = false;
         stopScreenShareButton.disabled = true;
-    } catch (error) {
-        console.error("Error stopping screen share:", error);
+        screenStream = null;
     }
-});
+}
 
-// Share microphone
-shareMicrophoneButton.addEventListener("click", async () => {
-    try {
-        const audioStream = await meeting.startAudio();
-        shareMicrophoneButton.disabled = true;
-        stopMicrophoneButton.disabled = false;
-    } catch (error) {
-        console.error("Error sharing microphone:", error);
-    }
-});
-
-// Stop microphone
-stopMicrophoneButton.addEventListener("click", async () => {
-    try {
-        await meeting.stopAudio();
-        shareMicrophoneButton.disabled = false;
-        stopMicrophoneButton.disabled = true;
-    } catch (error) {
-        console.error("Error stopping microphone:", error);
-    }
-});
-
-// Handle remote participants
-meeting.on("remoteTrackStarted", (trackItem) => {
-    const participant = meeting.participants.get(trackItem.participantSessionId);
-    let videoElement = document.getElementById(trackItem.participantSessionId);
-    
-    if (!videoElement) {
-        videoElement = document.createElement("video");
-        videoElement.id = trackItem.participantSessionId;
-        videoElement.autoplay = true;
-        videoElement.playsInline = true;
-        remoteVideoContainer.appendChild(videoElement);
-    }
-    
-    videoElement.srcObject = participant.stream;
-});
-
-meeting.on("remoteTrackStopped", (trackItem) => {
-    const videoElement = document.getElementById(trackItem.participantSessionId);
-    if (videoElement) {
-        videoElement.remove();
-    }
-});
-
-// Initialize the meeting
-joinSpace();
+// For simplicity, we'll remove the microphone sharing and remote video functionality
+// You can remove these elements from the HTML as well
     </script>
 </body>
 </html>
