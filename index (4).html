@@ -27,7 +27,7 @@
 </head>
 <body>
   <div id="game-container">
-    <canvas id="game-canvas" width="1000" height="1000"></canvas>
+    <canvas id="game-canvas" width="700" height="1000"></canvas>
   </div>
 
   <script>
@@ -110,6 +110,12 @@
         }
         if (enemy.y <= 0 || enemy.y >= canvas.height - enemySize) {
           enemy.dy *= -1;
+        }
+        if (playerX <= 0 || playerX >= canvas.width - enemySize) {
+          playerX *= -1;
+        }
+        if (playerY <= 0 || playerY >= canvas.height - enemySize) {
+          PlayerY *= -1;
         }
       });
     }
