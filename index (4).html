@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini-Game</title>
+  <title>Mini-Game with Enemies</title>
   <style>
-    /* Add some basic styles */
     body {
       font-family: Arial, sans-serif;
       background-color: #f0f0f0;
@@ -15,14 +14,12 @@
       height: 100vh;
       margin: 0;
     }
-
     #game-container {
       background-color: white;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-
     #game-canvas {
       border: 1px solid #ccc;
     }
@@ -34,24 +31,39 @@
   </div>
 
   <script>
-    // Get the canvas element and its 2D rendering context
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
 
-    // Game variables
-    let playerX = 50;
-    let playerY = 50;
-    let playerSize = 50;
-    let playerSpeed = 5;
+    // Player variables
+    let playerX = 200;
+    let playerY = 200;
+    const playerSize = 20;
+    const playerSpeed = 5;
 
-    // Draw the player
+    // Enemy variables
+    const enemies = [];
+    const enemySize = 15;
+    const enemySpeed = 2;
+    const numEnemies = 5;
+
+    // Game state
+    let gameOver = false;
+
     function drawPlayer() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = 'blue';
       ctx.fillRect(playerX, playerY, playerSize, playerSize);
     }
 
-    // Handle player movement
+    function drawEnemies() {
+      ctx.fillStyle = 'red';
+      enemies.forEach(enemy => {
+        ctx.fillRect(enemy.x, enemy.y, enemySize, enemySize);
+      });
+    }
+
     function movePlayer(direction) {
+      const diagonalSpeed = playerSpeed / Math.sqrt(2);
+
       switch (direction) {
         case 'up':
           playerY -= playerSpeed;
@@ -65,42 +77,111 @@
         case 'right':
           playerX += playerSpeed;
           break;
+        case 'upleft':
+          playerX -= diagonalSpeed;
+          playerY -= diagonalSpeed;
+          break;
+        case 'upright':
+          playerX += diagonalSpeed;
+          playerY -= diagonalSpeed;
+          break;
+        case 'downleft':
+          playerX -= diagonalSpeed;
+          playerY += diagonalSpeed;
+          break;
+        case 'downright':
+          playerX += diagonalSpeed;
+          playerY += diagonalSpeed;
+          break;
       }
 
-      // Keep the player within the canvas boundaries
       playerX = Math.max(0, Math.min(playerX, canvas.width - playerSize));
       playerY = Math.max(0, Math.min(playerY, canvas.height - playerSize));
-
-      drawPlayer();
     }
 
-    // Handle keyboard input
+    function moveEnemies() {
+      enemies.forEach(enemy => {
+        enemy.x += enemy.dx;
+        enemy.y += enemy.dy;
+
+        // Bounce off walls
+        if (enemy.x <= 0 || enemy.x >= canvas.width - enemySize) {
+          enemy.dx *= -1;
+        }
+        if (enemy.y <= 0 || enemy.y >= canvas.height - enemySize) {
+          enemy.dy *= -1;
+        }
+      });
+    }
+
+    function checkCollision() {
+      return enemies.some(enemy => 
+        playerX < enemy.x + enemySize &&
+        playerX + playerSize > enemy.x &&
+        playerY < enemy.y + enemySize &&
+        playerY + playerSize > enemy.y
+      );
+    }
+
+    const keysPressed = new Set();
+
     document.addEventListener('keydown', (event) => {
-      switch (event.key) {
-        case 'ArrowUp':
-        case 'w':
-          movePlayer('up');
-          break;
-        case 'ArrowDown':
-        case 's':
-          movePlayer('down');
-          break;
-        case 'ArrowLeft':
-        case 'a':
-          movePlayer('left');
-          break;
-        case 'ArrowRight':
-        case 'd':
-          movePlayer('right');
-          break;
-      }
+      keysPressed.add(event.key);
     });
 
-    // Start the game loop
-    function gameLoop() {
-      requestAnimationFrame(gameLoop);
-      // Add any other game logic here
+    document.addEventListener('keyup', (event) => {
+      keysPressed.delete(event.key);
+    });
+
+    function updateMovement() {
+      if (gameOver) return;
+
+      const up = keysPressed.has('ArrowUp') || keysPressed.has('w');
+      const down = keysPressed.has('ArrowDown') || keysPressed.has('s');
+      const left = keysPressed.has('ArrowLeft') || keysPressed.has('a');
+      const right = keysPressed.has('ArrowRight') || keysPressed.has('d');
+
+      if (up && left) movePlayer('upleft');
+      else if (up && right) movePlayer('upright');
+      else if (down && left) movePlayer('downleft');
+      else if (down && right) movePlayer('downright');
+      else if (up) movePlayer('up');
+      else if (down) movePlayer('down');
+      else if (left) movePlayer('left');
+      else if (right) movePlayer('right');
     }
+
+    function createEnemies() {
+      for (let i = 0; i < numEnemies; i++) {
+        enemies.push({
+          x: Math.random() * (canvas.width - enemySize),
+          y: Math.random() * (canvas.height - enemySize),
+          dx: (Math.random() - 0.5) * enemySpeed,
+          dy: (Math.random() - 0.5) * enemySpeed
+        });
+      }
+    }
+
+    function gameLoop() {
+      if (!gameOver) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        updateMovement();
+        moveEnemies();
+        drawPlayer();
+        drawEnemies();
+
+        if (checkCollision()) {
+          gameOver = true;
+          ctx.fillStyle = 'black';
+          ctx.font = '30px Arial';
+          ctx.fillText('Game Over!', canvas.width / 2 - 70, canvas.height / 2);
+        } else {
+          requestAnimationFrame(gameLoop);
+        }
+      }
+    }
+
+    createEnemies();
     gameLoop();
   </script>
 </body>
