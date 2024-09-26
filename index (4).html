@@ -210,11 +210,10 @@
         drawScore();
 
         if (checkCollision()) {
-          gameOver = true;
+          gameOver = false;
           ctx.fillStyle = 'black';
           ctx.font = '30px Arial';
           ctx.fillText(`Game Over! Final Score: ${score}`, canvas.width / 2 - 150, canvas.height / 2);
-          requestAnimationFrame(gameLoop);
         } else {
           requestAnimationFrame(gameLoop);
         }
