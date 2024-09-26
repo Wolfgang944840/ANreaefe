@@ -188,8 +188,8 @@
         enemies.push({
           x: Math.random() * (canvas.width - enemySize),
           y: Math.random() * (canvas.height - enemySize),
-          dx: (Math.random() - 0.5) * enemySpeed,
-          dy: (Math.random() - 0.5) * enemySpeed
+          dx: enemySpeed,
+          dy: enemySpeed
         });
       }
     }
