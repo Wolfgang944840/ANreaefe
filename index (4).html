@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini-Game with Enemies</title>
+  <title>Mini-Game with Enemies and Scoring</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -44,10 +44,13 @@
     const enemies = [];
     const enemySize = 15;
     const enemySpeed = 2;
-    const numEnemies = 50;
+    const numEnemies = 5;
 
     // Game state
     let gameOver = false;
+    let score = 0;
+    let lastX = playerX;
+    let lastY = playerY;
 
     function drawPlayer() {
       ctx.fillStyle = 'blue';
@@ -100,6 +103,15 @@
       if (playerX > canvas.width - playerSize) playerX = 0;
       if (playerY < 0) playerY = canvas.height - playerSize;
       if (playerY > canvas.height - playerSize) playerY = 0;
+
+      // Update score based on distance moved
+      const dx = playerX - lastX;
+      const dy = playerY - lastY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      score += Math.round(distance);
+
+      lastX = playerX;
+      lastY = playerY;
     }
 
     function moveEnemies() {
@@ -165,6 +177,12 @@
       }
     }
 
+    function drawScore() {
+      ctx.fillStyle = 'black';
+      ctx.font = '20px Arial';
+      ctx.fillText(`Score: ${score}`, 10, 30);
+    }
+
     function gameLoop() {
       if (!gameOver) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -172,12 +190,13 @@
         moveEnemies();
         drawPlayer();
         drawEnemies();
+        drawScore();
 
         if (checkCollision()) {
           gameOver = true;
           ctx.fillStyle = 'black';
           ctx.font = '30px Arial';
-          ctx.fillText('Game Over!', canvas.width / 2 - 70, canvas.height / 2);
+          ctx.fillText(`Game Over! Final Score: ${score}`, canvas.width / 2 - 150, canvas.height / 2);
         } else {
           requestAnimationFrame(gameLoop);
         }
