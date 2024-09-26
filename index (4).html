@@ -19,15 +19,32 @@
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
     }
     #game-canvas {
       border: 1px solid #ccc;
+    }
+    #refresh-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #refresh-button:hover {
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
   <div id="game-container">
     <canvas id="game-canvas" width="1000" height="700"></canvas>
+    <button id="refresh-button" onclick="location.reload()">Restart Game</button>
   </div>
 
   <script>
@@ -44,7 +61,7 @@
     const enemies = [];
     const enemySize = 15;
     const enemySpeed = 2;
-    const numEnemies = 5;
+    const numEnemies = 50;
 
     // Game state
     let gameOver = false;
