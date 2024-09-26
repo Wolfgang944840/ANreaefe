@@ -44,7 +44,7 @@
     const enemies = [];
     const enemySize = 15;
     const enemySpeed = 2;
-    const numEnemies = 5;
+    const numEnemies = 50;
 
     // Game state
     let gameOver = false;
@@ -93,17 +93,13 @@
           playerX += diagonalSpeed;
           playerY += diagonalSpeed;
           break;
-         }
-        if (playerX <= 0 || playerX >= canvas.width - enemySize) {
-          playerX *= -1;
-        }
-        if (playerY <= 0 || playerY >= canvas.height - enemySize) {
-          PlayerY *= -1;
-        }
       }
 
-      playerX = Math.max(0, Math.min(playerX, canvas.width - playerSize));
-      playerY = Math.max(0, Math.min(playerY, canvas.height - playerSize));
+      // Wrap around effect
+      if (playerX < 0) playerX = canvas.width - playerSize;
+      if (playerX > canvas.width - playerSize) playerX = 0;
+      if (playerY < 0) playerY = canvas.height - playerSize;
+      if (playerY > canvas.height - playerSize) playerY = 0;
     }
 
     function moveEnemies() {
@@ -117,7 +113,7 @@
         }
         if (enemy.y <= 0 || enemy.y >= canvas.height - enemySize) {
           enemy.dy *= -1;
-       
+        }
       });
     }
 
